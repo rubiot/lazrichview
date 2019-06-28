@@ -1000,6 +1000,7 @@ begin
       Canvas.Font.Style := Style;
       Canvas.Font.Size  := Size;
       Canvas.Font.Name  := FontName;
+      Canvas.Font.Quality := Quality;
       {$IFDEF RICHVIEWDEF3}
       Canvas.Font.CharSet  := CharSet;
       {$ENDIF}
@@ -1523,6 +1524,7 @@ begin
     Canvas.Font.Color := clWindowText;
     Canvas.Font.Name := 'MS Sans Serif';
     Canvas.Font.Size := 8;
+    Canvas.Font.Quality := fqDefault;
     Canvas.Font.Style := [];
     Canvas.FillRect(Canvas.ClipRect);
     if (csDesigning in ComponentState) then
@@ -1568,6 +1570,7 @@ begin
         canv.Font.Style := FStyle.TextStyles[StyleNo].Style;
         canv.Font.Size := FStyle.TextStyles[StyleNo].Size;
         canv.Font.Name := FStyle.TextStyles[StyleNo].FontName;
+        canv.Font.Quality := FStyle.TextStyles[StyleNo].Quality;
         {$IFDEF RICHVIEWDEF3}
         canv.Font.CharSet := FStyle.TextStyles[StyleNo].CharSet;
         {$ENDIF}
@@ -2332,6 +2335,7 @@ begin
           Canvas.Font.Style := Style;
           Canvas.Font.Size  := Size;
           Canvas.Font.Name  := FontName;
+          Canvas.Font.Quality := Quality;
           {$IFDEF RICHVIEWDEF3}
           Canvas.Font.CharSet  := CharSet;
           {$ENDIF}
@@ -2406,6 +2410,7 @@ begin
         Canvas.Font.Style := Style;
         Canvas.Font.Size  := Size;
         Canvas.Font.Name  := FontName;
+        Canvas.Font.Quality := Quality;
         {$IFDEF RICHVIEWDEF3}
         Canvas.Font.CharSet  := CharSet;
         {$ENDIF}

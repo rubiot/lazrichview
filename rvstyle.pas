@@ -37,6 +37,7 @@ type
     FSize: Integer;
     FColor: TColor;
     FStyle: TFontStyles;
+    FQuality: TFontQuality;
     {$IFDEF RICHVIEWDEF3}
     FCharSet: TFontCharSet;
     {$ENDIF}
@@ -53,6 +54,7 @@ type
     property Size: Integer read FSize write FSize;
     property Color: TColor read FColor write FColor;
     property Style: TFontStyles read FStyle write FStyle;
+    property Quality: TFontQuality read FQuality write FQuality;
   end;
 {--------------------------------------------------------------}
   TFontInfos = class(TCollection)
@@ -120,6 +122,7 @@ begin
   FSize := 10;
   FColor := clWindowText;
   FStyle := [];
+  FQuality := fqDefault;
   {$IFDEF RICHVIEWDEF3}
   FCharSet := DEFAULT_CHARSET;
   {$ENDIF}
@@ -133,6 +136,7 @@ begin
     FSize := TFontInfo(Source).FSize;
     FColor := TFontInfo(Source).FColor;
     FStyle := TFontInfo(Source).FStyle;
+    FQuality := TFontInfo(Source).FQuality;
     {$IFDEF RICHVIEWDEF3}
     FCharSet := TFontInfo(Source).FCharSet;
     {$ENDIF}
