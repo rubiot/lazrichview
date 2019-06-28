@@ -80,7 +80,9 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 const crlf:String = chr(13)+chr(10);
       rvsProgram = LAST_DEFAULT_STYLE_NO+1;
-      rvsLetter = LAST_DEFAULT_STYLE_NO+2;      
+      rvsLetter = LAST_DEFAULT_STYLE_NO+2;
+      rvsSubScript = LAST_DEFAULT_STYLE_NO+3;
+      rvsSuperScript = LAST_DEFAULT_STYLE_NO+4;
 var QuakeHead: TIcon;
     btn: TDemoButton;
 begin
@@ -93,6 +95,10 @@ begin
          for no particular reason}
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   with RichView1 do begin
+     AddTextFromNewLine('Normal script text', rvsNormal);
+     AddText(' | Subscript text', rvsSubScript);
+     AddText(' | Superscript text', rvsSuperScript);
+
      AddCenterLine('TRichView Demo and Help Program', rvsHeading);
      Self.RemoveControl(Image1);
      AddControl(Image1, True);

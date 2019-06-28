@@ -30,6 +30,8 @@ const
 
 type
 {--------------------------------------------------------------}
+  TScriptPos = (spNormal, spSuperScript, spSubscript);
+
   TFontInfo = class(TCollectionItem)
   private
     { Private declarations }
@@ -38,6 +40,7 @@ type
     FColor: TColor;
     FStyle: TFontStyles;
     FQuality: TFontQuality;
+    FScriptPos: TScriptPos;
     {$IFDEF RICHVIEWDEF3}
     FCharSet: TFontCharSet;
     {$ENDIF}
@@ -55,6 +58,7 @@ type
     property Color: TColor read FColor write FColor;
     property Style: TFontStyles read FStyle write FStyle;
     property Quality: TFontQuality read FQuality write FQuality;
+    property ScriptPos: TScriptPos read FScriptPos write FScriptPos;
   end;
 {--------------------------------------------------------------}
   TFontInfos = class(TCollection)
@@ -123,6 +127,7 @@ begin
   FColor := clWindowText;
   FStyle := [];
   FQuality := fqDefault;
+  FScriptPos := spNormal;
   {$IFDEF RICHVIEWDEF3}
   FCharSet := DEFAULT_CHARSET;
   {$ENDIF}
@@ -137,6 +142,7 @@ begin
     FColor := TFontInfo(Source).FColor;
     FStyle := TFontInfo(Source).FStyle;
     FQuality := TFontInfo(Source).FQuality;
+    FScriptPos := TFontInfo(Source).FScriptPos;
     {$IFDEF RICHVIEWDEF3}
     FCharSet := TFontInfo(Source).FCharSet;
     {$ENDIF}

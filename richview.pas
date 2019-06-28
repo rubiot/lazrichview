@@ -979,6 +979,7 @@ var
   sz: TSIZE;
   TextMetr: TTextMetric;
   hBetweenLines: Integer;
+  FontHeight: Integer;
   IsNewLine, IsCenter: Boolean;
   JmpInfo: TJumpInfo;
 begin
@@ -1001,6 +1002,32 @@ begin
       Canvas.Font.Size  := Size;
       Canvas.Font.Name  := FontName;
       Canvas.Font.Quality := Quality;
+
+      FontHeight := Canvas.Font.Height;
+      case ScriptPos of
+        spNormal: ;
+        spSuperScript: Canvas.Font.Height := Canvas.Font.Height*9 div 10;
+        spSubscript:   Canvas.Font.Height := Canvas.Font.Height*9 div 10;
+      end;
+
+      {
+      FontHeight := Canvas.Font.Height;
+      case FStyle.TextStyles[StyleNo].ScriptPos of
+        spNormal:
+          ScriptPosOffset := 0;
+        spSuperScript:
+        begin
+          Canvas.Font.Height := Canvas.Font.Height*9 div 10;
+          ScriptPosOffset := abs(8*Canvas.Font.Height-10*FontHeight) div -10;
+        end;
+        spSubscript:
+        begin
+          Canvas.Font.Height := Canvas.Font.Height*9 div 10;
+          ScriptPosOffset := abs(8*Canvas.Font.Height-10*FontHeight) div 10;
+        end;
+      end;
+      }
+
       {$IFDEF RICHVIEWDEF3}
       Canvas.Font.CharSet  := CharSet;
       {$ENDIF}
@@ -1008,6 +1035,7 @@ begin
     TextMetr.tmAscent := 0;
     GetTextMetrics(Canvas.Handle, TextMetr);
     hBetweenLines := TextMetr.tmExternalLeading + TextMetr.tmAscent;
+    Canvas.Font.Height := FontHeight;
   end;
   IsNewLine := Item.FromNewLine;
   IsCenter := (Item.Alignment = taCenter);
@@ -1505,6 +1533,7 @@ var
   canv: TCanvas;
   s, s1: String;
   StartNo, EndNo, StartOffs, EndOffs: Integer;
+  ScriptPosOffset, FontHeight: Integer;
   {$IFDEF FPC}
   St: string;
   {$ENDIF}
@@ -1575,6 +1604,22 @@ begin
         canv.Font.CharSet := FStyle.TextStyles[StyleNo].CharSet;
         {$ENDIF}
 
+        FontHeight := Canvas.Font.Height;
+        case FStyle.TextStyles[StyleNo].ScriptPos of
+          spNormal:
+            ScriptPosOffset := 0;
+          spSuperScript:
+          begin
+            Canvas.Font.Height := Canvas.Font.Height*9 div 10;
+            ScriptPosOffset := abs(8*Canvas.Font.Height-10*FontHeight) div -10;
+          end;
+          spSubscript:
+          begin
+            Canvas.Font.Height := Canvas.Font.Height*9 div 10;
+            ScriptPosOffset := abs(8*Canvas.Font.Height-10*FontHeight) div 10;
+          end;
+        end;
+
         if not ((StyleNo in [rvsJump1, rvsJump2]) and IsDrawHover and (LastJumpMovedAbove <> -1) and (Item.JumpId = LastJumpMovedAbove)) then
         begin
           TextColor := FStyle.TextStyles[StyleNo].Color;
@@ -1590,7 +1635,7 @@ begin
         if (StartNo > i) or (EndNo < i) then
         begin
           canv.Font.Color := TextColor;
-          canv.TextOut(Item.Left-xshift, Item.Top-yshift, Item.Text);
+          canv.TextOut(Item.Left-xshift, Item.Top-yshift+ScriptPosOffset, Item.Text);
         end
         else
         if ((StartNo < i) and (EndNo > i))
@@ -1603,9 +1648,9 @@ begin
           if not IsHoverNow then
             canv.Font.Color := FStyle.SelTextColor;
           {$IFDEF FPC}
-          TxtOut(canv, Item.Left-xshift, Item.Top-yshift, Item.Text);
+          TxtOut(canv, Item.Left-xshift, Item.Top-yshift+ScriptPosOffset, Item.Text);
           {$ELSE}
-          canv.TextOut(Item.Left-xshift, Item.Top-yshift, Item.Text);
+          canv.TextOut(Item.Left-xshift, Item.Top-yshift+ScriptPosOffset, Item.Text);
           {$ENDIF}
           canv.Brush.Style := bsClear;
         end
@@ -1614,7 +1659,7 @@ begin
         begin
           canv.Font.Color := TextColor;
           s := Copy(Item.Text, 1, StartOffs-1);
-          canv.TextOut(Item.Left-xshift, Item.Top-yshift, s);
+          canv.TextOut(Item.Left-xshift, Item.Top-yshift+ScriptPosOffset, s);
           canv.Brush.Style := bsSolid;
           canv.Brush.Color := FStyle.SelColor;
           if not IsHoverNow then
@@ -1623,9 +1668,9 @@ begin
           begin
             {$IFDEF FPC}
             St := Copy(Item.Text, StartOffs, Length(Item.Text));
-            TxtOut(canv, Item.Left-xshift + canv.TextWidth(s), Item.Top-yshift, st);
+            TxtOut(canv, Item.Left-xshift + canv.TextWidth(s), Item.Top-yshift+ScriptPosOffset, st);
             {$ELSE}
-            canv.TextOut(Item.Left-xshift + canv.TextWidth(s), Item.Top-yshift,
+            canv.TextOut(Item.Left-xshift + canv.TextWidth(s), Item.Top-yshift+ScriptPosOffset,
                          Copy(Item.Text, StartOffs, Length(Item.Text)));
             {$ENDIF}
             canv.Brush.Style := bsClear;
@@ -1634,13 +1679,13 @@ begin
           begin
             s1 := Copy(Item.Text, StartOffs, EndOffs-StartOffs);
             {$IFDEF FPC}
-            TxtOut(canv, Item.Left - xshift + canv.TextWidth(s), Item.Top-yshift, s1);
+            TxtOut(canv, Item.Left - xshift + canv.TextWidth(s), Item.Top-yshift+ScriptPosOffset, s1);
             {$ELSE}
-            canv.TextOut(Item.Left - xshift + canv.TextWidth(s), Item.Top-yshift, s1);
+            canv.TextOut(Item.Left - xshift + canv.TextWidth(s), Item.Top-yshift+ScriptPosOffset, s1);
             {$ENDIF}
             canv.Font.Color := TextColor;
             canv.Brush.Style := bsClear;
-            canv.TextOut(Item.Left - xshift + canv.TextWidth(s+s1), Item.Top-yshift,
+            canv.TextOut(Item.Left - xshift + canv.TextWidth(s+s1), Item.Top-yshift+ScriptPosOffset,
                          Copy(Item.Text, EndOffs, Length(Item.Text)));
           end;
         end
@@ -1653,13 +1698,13 @@ begin
           if (not IsHoverNow) then
             canv.Font.Color := FStyle.SelTextColor;
           {$IFDEF FPC}
-          TxtOut(canv, Item.Left - xshift, Item.Top - yshift, s);
+          TxtOut(canv, Item.Left - xshift, Item.Top - yshift + ScriptPosOffset, s);
           {$ELSE}
-          canv.TextOut(Item.Left - xshift, Item.Top - yshift, s);
+          canv.TextOut(Item.Left - xshift, Item.Top - yshift + ScriptPosOffset, s);
           {$ENDIF}
           canv.Brush.Style := bsClear;
           canv.Font.Color := TextColor;
-          canv.TextOut(Item.Left - xshift + canv.TextWidth(s), Item.Top - yshift,
+          canv.TextOut(Item.Left - xshift + canv.TextWidth(s), Item.Top - yshift + ScriptPosOffset,
                        Copy(Item.Text, EndOffs, Length(Item.Text)));
         end;
         {$ifdef DEBUG}
@@ -1675,6 +1720,7 @@ begin
           canv.Brush.Style := bsClear;
         end;
         {$endif}
+        Canvas.Font.Height := FontHeight;
         Continue;
       end;
 
@@ -2230,6 +2276,7 @@ var
   StyleNo, i: Integer;
   mid, midtop, midbottom, midleft, midright: Integer;
   beginline, endline: Integer;
+  FontHeight: Integer;
   Item, ItemMid: TRVItem;
   {$IFNDEF RICHVIEWDEF4}
   arr: array[0..1000] of integer;
@@ -2339,6 +2386,13 @@ begin
           {$IFDEF RICHVIEWDEF3}
           Canvas.Font.CharSet  := CharSet;
           {$ENDIF}
+
+          FontHeight := Canvas.Font.Height;
+          case ScriptPos of
+            spNormal: ;
+            spSuperScript: Canvas.Font.Height := Canvas.Font.Height*9 div 10;
+            spSubscript:   Canvas.Font.Height := Canvas.Font.Height*9 div 10;
+          end;
         end;
         sz.cx := 0;
         sz.cy := 0;
@@ -2359,6 +2413,8 @@ begin
           TextOffs := Length(Item.Text);
         if (TextOffs < 1) and (Length(Item.Text) > 0) then
           TextOffs := 1;
+
+        Canvas.Font.Height := FontHeight;
       end
       else
         TextOffs := 1;
@@ -2396,6 +2452,7 @@ var
   {$ENDIF}
   sz: TSIZE;
   max, first, len: Integer;
+  FontHeight: Integer;
 begin
   Result := False;
   no := FindVisItemAtPos(ClickPos.X + HPos, ClickPos.Y + VPos * SmallStep);
@@ -2414,6 +2471,13 @@ begin
         {$IFDEF RICHVIEWDEF3}
         Canvas.Font.CharSet  := CharSet;
         {$ENDIF}
+
+        FontHeight := Canvas.Font.Height;
+        case ScriptPos of
+          spNormal: ;
+          spSuperScript: Canvas.Font.Height := Canvas.Font.Height*9 div 10;
+          spSubscript:   Canvas.Font.Height := Canvas.Font.Height*9 div 10;
+        end;
       end;
       sz.cx := 0;
       sz.cy := 0;
@@ -2446,6 +2510,8 @@ begin
       while (first + len- 1 < Length(sClickedWord)) and (Pos(sClickedWord[first + len], Delimiters) = 0) do
         Inc(len);
       sClickedWord := Copy(sClickedWord, first, len);
+
+      Canvas.Font.Height := FontHeight;
     end;
     Result := True;
   end;
